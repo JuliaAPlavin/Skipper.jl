@@ -23,17 +23,6 @@ using TestItemRunner
     @test filter(x -> x > 10, sa) == [20]
     @test findmax(sa) == (20, 4)
 
-    @test_throws "is skipped" sa .= .-sa
-    sa .= 2 .* sa
-    @test collect(sa) == [4, 40]
-    @test isequal(a, [missing, -1, 4, 40])
-    sa .= sa .+ sa
-    @test collect(sa) == [8, 80]
-    @test isequal(a, [missing, -1, 8, 80])
-    sa .= (i for i in sa)
-    @test collect(sa) == [8, 80]
-    @test isequal(a, [missing, -1, 8, 80])
-
     @test collect(skipnan([1, NaN, 3])) == [1, 3]
 
     @test @inferred(eltype(skip(ismissing, [1, missing, nothing, 2, 3]))) == Union{Int, Nothing}
@@ -41,6 +30,28 @@ using TestItemRunner
     @test @inferred(eltype(skip(x -> !(x isa Int), [1, missing, nothing, 2, 3]))) == Int
     @test @inferred(eltype(skip(x -> ismissing(x) || x < 0, [1, missing, 2, 3]))) == Int
     @test @inferred(eltype(skip(x -> ismissing(x) || x < 0, (x for x in [1, missing, 2, 3])))) == Int
+end
+
+@testitem "setindex" begin
+    a = [missing, -1, 2, 3]
+    sa = @inferred(skip(x -> ismissing(x) || x < 0, a))
+
+    # @test_throws "is skipped" sa .= .-sa  # should it check the new value?
+    sa .= 2 .* sa
+    @test collect(sa) == [4, 6]
+    @test isequal(a, [missing, -1, 4, 6])
+    sa .= sa .+ sa
+    @test collect(sa) == [8, 12]
+    @test isequal(a, [missing, -1, 8, 12])
+    sa .= (i for i in sa)
+    @test collect(sa) == [8, 12]
+    @test isequal(a, [missing, -1, 8, 12])
+
+    a = [missing, 2, 3]
+    sa = skip(ismissing, a)
+    skip(!ismissing, a) .= sum(sa)
+    @test a == [5, 2, 3]
+    @test collect(sa) == [5, 2, 3]
 end
 
 @testitem "array types" begin

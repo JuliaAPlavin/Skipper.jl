@@ -29,7 +29,7 @@ end
 Base.@propagate_inbounds function Base.setindex!(s::Skip, v, I...)
     oldv = parent(s)[I...]
     _pred(s)(oldv) && throw(MissingException("existing value at index $I is skipped"))
-    _pred(s)(v) && throw(MissingException("new value to be set at index $I is skipped"))
+    # _pred(s)(v) && throw(MissingException("new value to be set at index $I is skipped"))  # should it check the new value?
     return setindex!(parent(s), v, I...)
 end
 
