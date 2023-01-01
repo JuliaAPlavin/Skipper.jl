@@ -59,7 +59,6 @@ julia> mean(sa)
 # skip() objects support setindex!
 # this makes transforming valid (non-skipped) elements easy:
 julia> sa .= ifelse.(sa .> 2, 3, 1)
-skip(var"#5#6"(), Union{Missing, Float64}[missing, 1.0, 1.0, NaN, 3.0])
 julia> a
 5-element Vector{Union{Missing, Float64}}:
     missing
