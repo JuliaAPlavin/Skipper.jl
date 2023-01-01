@@ -8,7 +8,7 @@ struct Skip{P, TX}
 end
 
 const skipnan = Base.Fix1(skip, isnan)
-Base.skip(pred, X) = Skip(pred, X)
+Base.skip(pred::Function, X) = Skip(pred, X)
 complement(s::Skip) = Skip(!_pred(s), parent(s))
 
 
