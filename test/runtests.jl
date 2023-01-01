@@ -7,6 +7,7 @@ using TestItemRunner
     a = [missing, -1, 2, 3]
     sa = @inferred(skip(x -> ismissing(x) || x < 0, a))
     @test collect(sa) == [2, 3]
+    @test length(sa) == 2
     # ensure we get a view
     a[4] = 20
     @test collect(sa) == [2, 20]
@@ -47,11 +48,11 @@ end
     @test collect(sa) == [8, 12]
     @test isequal(a, [missing, -1, 8, 12])
 
-    a = [missing, 2, 3]
+    a = [missing, 2, 3, missing]
     skip(!ismissing, a) .= sum(skip(ismissing, a))
-    @test a == [5, 2, 3]
+    @test a == [5, 2, 3, 5]
 
-    a = [missing, 2, 3]
+    a = [missing, 2, 3, missing]
     sa = skip(ismissing, a)
     Skipper.complement(sa) .= sum(sa)
     @test a == [5, 2, 3, 5]

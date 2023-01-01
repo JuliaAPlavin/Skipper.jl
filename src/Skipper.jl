@@ -17,6 +17,7 @@ Base.parent(s::Skip) = getfield(s, :parent)
 Base.IteratorSize(::Type{<:Skip}) = Base.SizeUnknown()
 Base.IteratorEltype(::Type{<:Skip{P, TX}}) where {P, TX} = Base.IteratorEltype(TX)
 Base.eltype(::Type{Skip{P, TX}}) where {P, TX} = _try_reducing_type(_eltype(TX), P)
+Base.length(s::Skip) = count(Returns(true), s)
 
 Base.IndexStyle(::Type{<:Skip{P, TX}}) where {P, TX} = Base.IndexStyle(TX)
 Base.eachindex(s::Skip) = Iterators.filter(i -> !_pred(s)(@inbounds parent(s)[i]), eachindex(parent(s)))
@@ -62,7 +63,9 @@ end
 Base.BroadcastStyle(::Type{<:Skip}) = Broadcast.Style{Skip}()
 Base.BroadcastStyle(::Broadcast.Style{Skip}, ::Broadcast.DefaultArrayStyle) = Broadcast.Style{Skip}()
 Base.BroadcastStyle(::Broadcast.DefaultArrayStyle, ::Broadcast.Style{Skip}) = Broadcast.Style{Skip}()
-Broadcast.materialize!(::Broadcast.Style{Skip}, dest::Skip, bc::Broadcast.Broadcasted) = copyto!(dest, bc)
+Broadcast.materialize!(::Broadcast.Style{Skip}, dest::Skip, bc::Broadcast.Broadcasted{Style}) where {Style} =
+    copyto!(dest, Broadcast.instantiate(Broadcast.Broadcasted{Style}(bc.f, bc.args, (Base.OneTo(length(dest)),))))
+
 function Base.copyto!(dest::Skip, src::Broadcast.Broadcasted)
     destiter = eachindex(dest)
     y = iterate(destiter)
