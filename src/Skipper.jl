@@ -103,14 +103,13 @@ end
 
 
 
+# same as in FlexiMaps
 _eltype(::T) where {T} = _eltype(T)
+_eltype(::Type{Union{}}) = Union{}
 function _eltype(::Type{T}) where {T}
     ETb = eltype(T)
     ETb != Any && return ETb
-    # Base.eltype returns Any for mapped/flattened/... iterators
-    # here we attempt to infer a tighter type
-    ET = Core.Compiler.return_type(first, Tuple{T})
-    ET === Union{} ? Any : ET
+    ET = Core.Compiler.return_type(Base._iterator_upper_bound, Tuple{T})
 end
 
 end
