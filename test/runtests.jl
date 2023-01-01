@@ -18,6 +18,7 @@ using TestItemRunner
 
     @test_throws "is skipped" sa[1]
     @test sa[3] == 2
+    @test sa[CartesianIndex(3)] == 2
     @test map(x -> x + 1, sa) == [3, 21]
     @test filter(x -> x > 10, sa) == [20]
     @test findmax(sa) == (20, 4)
