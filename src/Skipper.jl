@@ -2,13 +2,15 @@ module Skipper
 
 export skip, skipnan
 
-const skipnan = Base.Fix1(skip, isnan)
-Base.skip(pred, X) = Skip(pred, X)
-
 struct Skip{P, TX}
     pred::P
     parent::TX
 end
+
+const skipnan = Base.Fix1(skip, isnan)
+Base.skip(pred, X) = Skip(pred, X)
+complement(s::Skip) = Skip(!_pred(s), parent(s))
+
 
 _pred(s::Skip) = getfield(s, :pred)
 Base.parent(s::Skip) = getfield(s, :parent)

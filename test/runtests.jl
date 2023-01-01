@@ -48,10 +48,13 @@ end
     @test isequal(a, [missing, -1, 8, 12])
 
     a = [missing, 2, 3]
-    sa = skip(ismissing, a)
-    skip(!ismissing, a) .= sum(sa)
+    skip(!ismissing, a) .= sum(skip(ismissing, a))
     @test a == [5, 2, 3]
-    @test collect(sa) == [5, 2, 3]
+
+    a = [missing, 2, 3]
+    sa = skip(ismissing, a)
+    Skipper.complement(sa) .= sum(sa)
+    @test a == [5, 2, 3, 5]
 end
 
 @testitem "array types" begin
