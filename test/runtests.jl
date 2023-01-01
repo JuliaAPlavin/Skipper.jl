@@ -12,6 +12,12 @@ using TestItemRunner
     a[4] = 20
     @test collect(sa) == [2, 20]
 
+    @test collect(skip(ismissing, [1, 2]))::Vector{Int} == [1, 2]
+    @test collect(skip(ismissing, [missing]))::Vector{Union{}} == []
+    @test collect(skip(ismissing, Union{Missing, Int}[missing]))::Vector{Int} == []
+    @test collect(skip(ismissing, Missing[]))::Vector{Union{}} == []
+    @test collect(skip(ismissing, Union{Missing, Int}[]))::Vector{Int} == []
+
     @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, a))) == Int
     @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, [missing, -1]))) == Int
     @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, Union{Int, Missing}[missing]))) == Int
