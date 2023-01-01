@@ -11,6 +11,11 @@ using TestItemRunner
     a[4] = 20
     @test collect(sa) == [2, 20]
 
+    @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, a))) == Int
+    @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, [missing, -1]))) == Int
+    @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, Union{Int, Missing}[missing]))) == Int
+    @test eltype(@inferred(skip(x -> ismissing(x) || x < 0, [missing]))) == Union{}
+
     @test_throws "is skipped" sa[1]
     @test sa[3] == 2
     @test map(x -> x + 1, sa) == [3, 21]
