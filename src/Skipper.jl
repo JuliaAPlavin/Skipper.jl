@@ -14,6 +14,7 @@ complement(s::Skip) = Skip(!_pred(s), parent(s))
 
 _pred(s::Skip) = getfield(s, :pred)
 Base.parent(s::Skip) = getfield(s, :parent)
+parent_type(::Type{Skip{P, TX}}) where {P, TX} = TX
 Base.IteratorSize(::Type{<:Skip}) = Base.SizeUnknown()
 Base.IteratorEltype(::Type{<:Skip{P, TX}}) where {P, TX} = Base.IteratorEltype(TX)
 Base.eltype(::Type{Skip{P, TX}}) where {P, TX} = _try_reducing_type(_eltype(TX), P)
@@ -59,6 +60,19 @@ function Base.filter(f, s::Skip)
     end
     y
 end
+
+function Base.map(f, A::Skip)
+    a = similar(A, Core.Compiler.return_type(f, Tuple{eltype(A)}), 0)
+    for x in A
+        push!(a, f(x))
+    end
+    return a
+end
+
+Base.similar(::Type{T}, args...) where {T <: Skip} = similar(parent_type(T), args...)
+Base.similar(A::Skip, args...) = similar(parent(A), args...)
+Base._similar_for(c::Skip, ::Type{T}, itr, ::Base.SizeUnknown, ::Nothing) where {T} = similar(c, T, 0)
+
 
 Base.BroadcastStyle(::Type{<:Skip}) = Broadcast.Style{Skip}()
 Base.BroadcastStyle(::Broadcast.Style{Skip}, ::Broadcast.DefaultArrayStyle) = Broadcast.Style{Skip}()
