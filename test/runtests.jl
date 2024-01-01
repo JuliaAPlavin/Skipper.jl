@@ -193,6 +193,12 @@ end
     end
 end
 
+@testitem "curried" begin
+    a = [1, 2, missing]
+    @test skip(ismissing)(a) === skip(ismissing, a)
+    @test filterview(!ismissing)(a) == filterview(!ismissing, a)
+end
+
 
 @testitem "_" begin
     import Aqua

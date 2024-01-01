@@ -127,6 +127,11 @@ function _unsafe_typed_view(::Type{ET}, X::AbstractArray, IX) where {ET}
 end
 
 
+# curried versions
+Base.skip(pred::Function) = Base.Fix1(skip, pred)
+filterview(f::Function) = Base.Fix1(filterview, f)
+
+
 # some tricks to make eltype tighter when possible:
 
 _subtract_pred_type(::Type{T}, ::Type) where {T} = T
