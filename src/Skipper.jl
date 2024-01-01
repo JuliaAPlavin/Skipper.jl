@@ -1,6 +1,6 @@
 module Skipper
 
-export skip
+export skip, filterview
 
 struct Skip{P, TX}
     pred::P
@@ -107,7 +107,18 @@ function Base.show(io::IO, s::Skip)
 end
 
 
-# some tricks to make eltype(Skip) tighter when possible
+"""    filterview(f, X)
+Like `filter(f, X)`, but returns a view instead of a copy. """
+function filterview end
+
+function filterview(f, X::AbstractArray)
+    ET = _try_reducing_type(_eltype(X), typeof(!f))
+    IX = findall(f, X)
+    SubArray{ET, 1, typeof(X), typeof((IX,)), false}(X, (IX,), 0, 0)
+end
+
+
+# some tricks to make eltype tighter when possible:
 
 _subtract_pred_type(::Type{T}, ::Type) where {T} = T
 _subtract_pred_type(::Type{T}, ::Type{typeof(ismissing)}) where {T} = Base.nonmissingtype(T)

@@ -118,6 +118,50 @@ end
     end
 end
 
+@testitem "filterview" begin
+    a = [missing, -1, 2, 3]
+    fa = @inferred(filterview(x -> !ismissing(x) && x > 0, a))
+    @test fa == [2, 3]
+    @test fa[2] == 3
+    @test fa isa AbstractVector{Int}
+    # ensure we get a view
+    a[4] = 20
+    fa[1] = 10
+    @test isequal(a, [missing, -1, 10, 20])
+    @test fa == [10, 20]
+
+    @test eltype(@inferred(filterview(x -> !ismissing(x) && x > 0, a))) == Int
+    @test eltype(@inferred(filterview(x -> !ismissing(x) && x > 0, [missing, -1]))) == Int
+    @test eltype(@inferred(filterview(x -> !ismissing(x) && x > 0, Union{Int, Missing}[missing]))) == Int
+    @test eltype(@inferred(filterview(x -> !ismissing(x) && x > 0, [missing]))) == Union{}
+    @test eltype(@inferred filterview(!ismissing, [1, missing, nothing, 2, 3])) == Union{Int, Nothing}
+    @test eltype(@inferred filterview(!isnothing, [1, missing, nothing, 2, 3])) == Union{Int, Missing}
+    @test eltype(@inferred filterview(x -> x isa Int, [1, missing, nothing, 2, 3])) == Int
+    @test eltype(@inferred filterview(x -> !ismissing(x) && x > 0, [1, missing, 2, 3])) == Int
+
+    if VERSION >= v"1.9-DEV"
+        using Dictionaries: dictionary
+        a = dictionary(zip([:a, :b, :c], [missing, -1, 2]))
+        fa = @inferred(filterview(!ismissing, a))
+        @test fa == dictionary(zip([:b, :c], [-1, 2]))
+    end
+
+    using Accessors
+    if VERSION >= v"1.9-DEV"
+        a = [missing, -1., 2, 3]
+        normalize(x::AbstractVector{Float64}) = x ./ sum(x)
+        b = @modify(normalize, a |> filterview(!ismissing, _))
+        @test b isa AbstractVector{Union{Missing,Float64}}
+        @test isequal(b, [missing, -0.25, 0.5, 0.75])
+
+        using AxisKeys
+        a = KeyedArray([missing, -1., 2, 3], b=[1, 2, 3, 4])
+        b = @modify(normalize, a |> filterview(!ismissing, _))
+        @test b isa KeyedArray{Union{Missing,Float64}}
+        @test isequal(b, [missing, -0.25, 0.5, 0.75])
+    end
+end
+
 
 @testitem "_" begin
     import Aqua

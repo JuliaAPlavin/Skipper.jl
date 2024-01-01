@@ -1,17 +1,21 @@
 name = "Skipper"
 uuid = "fc65d762-6112-4b1c-b428-ad0792653d81"
 authors = ["Alexander Plavin <alexander@plav.in>"]
-version = "0.1.5"
+version = "0.1.6"
 
 [weakdeps]
 Accessors = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
+Dictionaries = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
 
 [extensions]
 AccessorsExt = "Accessors"
+DictionariesExt = "Dictionaries"
 
 [compat]
 Accessors = "0.1"
+Dictionaries = "0.3"
 julia = "1.6"
 
 [extras]
 Accessors = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
+Dictionaries = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
