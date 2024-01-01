@@ -70,6 +70,7 @@ function Base.map(f, A::Skip)
     return a
 end
 
+Base.axes(s::Skip, args...) = axes(parent(s), args...)
 Base.view(s::Skip, args...) = skip(_pred(s), view(parent(s), args...))
 
 Base.eachslice(A::Skip; kwargs...) = map(a -> Skip(_pred(A), a), eachslice(parent(A); kwargs...))
