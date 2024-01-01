@@ -114,6 +114,12 @@ function filterview end
 function filterview(f, X::AbstractArray)
     ET = _try_reducing_type(_eltype(X), typeof(!f))
     IX = findall(f, X)
+    _unsafe_typed_view(ET, X, IX)
+end
+
+_unsafe_typed_view(::Type{ET}, X::AbstractArray{ET}, IX) where {ET} = view(X, IX)
+function _unsafe_typed_view(::Type{ET}, X::AbstractArray, IX) where {ET}
+    @assert ET <: eltype(X)
     SubArray{ET, 1, typeof(X), typeof((IX,)), false}(X, (IX,), 0, 0)
 end
 

@@ -120,7 +120,7 @@ end
 
 @testitem "filterview" begin
     a = [missing, -1, 2, 3]
-    fa = @inferred(filterview(x -> !ismissing(x) && x > 0, a))
+    fa = @inferred filterview(x -> !ismissing(x) && x > 0, a)
     @test fa == [2, 3]
     @test fa[2] == 3
     @test fa isa AbstractVector{Int}
@@ -138,6 +138,16 @@ end
     @test eltype(@inferred filterview(!isnothing, [1, missing, nothing, 2, 3])) == Union{Int, Missing}
     @test eltype(@inferred filterview(x -> x isa Int, [1, missing, nothing, 2, 3])) == Int
     @test eltype(@inferred filterview(x -> !ismissing(x) && x > 0, [1, missing, 2, 3])) == Int
+
+    using StructArrays
+    a = StructArray([1+2im, Inf+3im])
+    fa = @inferred filterview(isfinite, a)
+    @test fa isa StructArray{ComplexF64}
+    @test fa == [1+2im]
+    @test fa.re == [1]
+    a = StructArray(x=[1, 2], y=[3, missing])
+    fa = @inferred filterview(r -> !ismissing(r.y), a)
+    @test fa.x == [1]
 
     if VERSION >= v"1.9-DEV"
         using Dictionaries: dictionary
