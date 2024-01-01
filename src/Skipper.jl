@@ -18,7 +18,7 @@ parent_type(::Type{Skip{P, TX}}) where {P, TX} = TX
 Base.IteratorSize(::Type{<:Skip}) = Base.SizeUnknown()
 Base.IteratorEltype(::Type{<:Skip{P, TX}}) where {P, TX} = Base.IteratorEltype(TX)
 Base.eltype(::Type{Skip{P, TX}}) where {P, TX} = _try_reducing_type(_eltype(TX), P)
-Base.length(s::Skip) = count(Returns(true), s)
+Base.length(s::Skip) = count(!_pred(s), parent(s))
 
 Base.IndexStyle(::Type{<:Skip{P, TX}}) where {P, TX} = Base.IndexStyle(TX)
 Base.eachindex(s::Skip) = Iterators.filter(i -> !_pred(s)(@inbounds parent(s)[i]), eachindex(parent(s)))
@@ -52,6 +52,7 @@ end
 Base.collect(s::Skip) = filter(Returns(true), s)
 
 function Base.filter(f, s::Skip)
+    # cannot simply use filter on parent: need to narrow eltype when possible
     y = similar(parent(s), eltype(s), 0)
     for xi in parent(s)
         if !_pred(s)(xi) && f(xi)
