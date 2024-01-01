@@ -62,6 +62,17 @@ end
     @test_broken maximum(sa; dims=2) == [1, 3]
 end
 
+@testitem "set" begin
+    using Accessors
+    if VERSION >= v"1.9-DEV"
+        a = [missing, -1, 2, 3]
+        normalize(x) = x ./ sum(x)
+        b = @modify(normalize, a |> skip(ismissing, _))
+        @test b isa AbstractVector{Union{Missing,Float64}}
+        @test isequal(b, [missing, -0.25, 0.5, 0.75])
+    end
+end
+
 @testitem "setindex" begin
     a = [missing, -1, 2, 3]
     sa = @inferred(skip(x -> ismissing(x) || x < 0, a))
@@ -90,6 +101,7 @@ end
 @testitem "array types" begin
     using StructArrays
     using AxisKeys
+    using Accessors
 
     a = StructArray(a=[missing, -1, 2, 3])
     sa = @inferred skip(x -> ismissing(x.a) || x.a < 0, a)
@@ -100,12 +112,18 @@ end
     a = KeyedArray([missing, -1, 2, 3], b=[1, 2, 3, 4])
     sa = @inferred skip(x -> ismissing(x) || x < 0, a)
     @test_broken collect(sa)::KeyedArray == KeyedArray([2, 3], b=[3, 4])
+    if VERSION >= v"1.9-DEV"
+        normalize(x) = x ./ sum(x)
+        b = @modify(normalize, a |> skip(ismissing, _))
+        @test b isa KeyedArray{Union{Missing,Float64}}
+        @test isequal(b, [missing, -0.25, 0.5, 0.75])
+    end
 end
 
 
 @testitem "_" begin
     import Aqua
-    Aqua.test_all(Skipper; ambiguities=false, piracy=false)
+    Aqua.test_all(Skipper; ambiguities=false, piracy=false, project_toml_formatting=false)
     Aqua.test_ambiguities(Skipper)
 
     import CompatHelperLocal as CHL
