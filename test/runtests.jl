@@ -30,8 +30,6 @@ using TestItemRunner
     @test filter(x -> x > 10, sa) == [20]
     @test findmax(sa) == (20, 4)
 
-    @test collect(skipnan([1, NaN, 3])) == [1, 3]
-
     @test @inferred(eltype(skip(ismissing, [1, missing, nothing, 2, 3]))) == Union{Int, Nothing}
     @test @inferred(eltype(skip(isnothing, [1, missing, nothing, 2, 3]))) == Union{Int, Missing}
     @test @inferred(eltype(skip(x -> !(x isa Int), [1, missing, nothing, 2, 3]))) == Int
