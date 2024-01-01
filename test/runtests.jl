@@ -39,9 +39,16 @@ using TestItemRunner
     @test @inferred(eltype(skip(x -> ismissing(x) || x < 0, (x for x in [1, missing, 2, 3])))) == Int
 end
 
-@testitem "slices" begin
+@testitem "views, slices" begin
     a = [1 NaN; 2 3]
     sa = @inferred skip(isnan, a)
+
+    @test collect(view(sa, 1:1, 1:1)::Skipper.Skip) == [1]
+    @test collect(view(sa, 2, :)::Skipper.Skip) == [2, 3]
+    sv = view(sa, 1, 1:2)
+    @test sv[1] == 1
+    @test_throws "is skipped" sv[2] == 2
+
     @test maximum(sa) == 3
     @test isequal( maximum.(eachslice(a; dims=2)), [2, NaN] )
     @test maximum.(eachslice(sa; dims=2)) == [2, 3]

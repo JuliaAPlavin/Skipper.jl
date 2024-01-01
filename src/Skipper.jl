@@ -70,6 +70,8 @@ function Base.map(f, A::Skip)
     return a
 end
 
+Base.view(s::Skip, args...) = skip(_pred(s), view(parent(s), args...))
+
 Base.eachslice(A::Skip; kwargs...) = map(a -> Skip(_pred(A), a), eachslice(parent(A); kwargs...))
 Base.eachrow(A::Skip; kwargs...) = eachslice(A; dims=1)
 Base.eachcol(A::Skip; kwargs...) = eachslice(A; dims=2)
