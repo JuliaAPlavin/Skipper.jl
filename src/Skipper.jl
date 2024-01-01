@@ -53,7 +53,7 @@ Base.collect(s::Skip) = filter(Returns(true), s)
 
 function Base.filter(f, s::Skip)
     # cannot simply use filter on parent: need to narrow eltype when possible
-    y = similar(parent(s), eltype(s), 0)
+    y = similar(s, 0)
     for xi in parent(s)
         if !_pred(s)(xi) && f(xi)
             push!(y, xi)
@@ -77,9 +77,11 @@ Base.eachslice(A::Skip; kwargs...) = map(a -> Skip(_pred(A), a), eachslice(paren
 Base.eachrow(A::Skip; kwargs...) = eachslice(A; dims=1)
 Base.eachcol(A::Skip; kwargs...) = eachslice(A; dims=2)
 
-Base.similar(::Type{T}, args...) where {T <: Skip} = similar(parent_type(T), args...)
-Base.similar(A::Skip, args...) = similar(parent(A), args...)
-Base._similar_for(c::Skip, ::Type{T}, itr, ::Base.SizeUnknown, ::Nothing) where {T} = similar(c, T, 0)
+Base.similar(::Type{T}, axes) where {T <: Skip} = similar(similar(parent_type(T), args...), eltype(T))
+Base.similar(A::Skip) = similar(parent(A), eltype(A), length(A))
+Base.similar(A::Skip, ::Type{T}) where {T} = similar(parent(A), T, length(A))
+Base.similar(A::Skip, dims) = similar(parent(A), eltype(A), dims)
+Base.similar(A::Skip, ::Type{T}, dims) where {T} = similar(parent(A), T, dims)
 
 
 Base.BroadcastStyle(::Type{<:Skip}) = Broadcast.Style{Skip}()

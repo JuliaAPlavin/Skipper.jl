@@ -60,6 +60,22 @@ end
     @test_broken maximum(sa; dims=2) == [1, 3]
 end
 
+@testitem "similar" begin
+    s = skip(isnothing, [1, 2, nothing, missing])
+    @test eltype(s) == Union{Int, Missing}
+    @test length(similar(s)::Vector{Union{Int, Missing}}) == 3
+    @test length(similar(s, 1)::Vector{Union{Int, Missing}}) == 1
+    @test length(similar(s, Float64)::Vector{Float64}) == 3
+    @test length(similar(s, Float64, 5)::Vector{Float64}) == 5
+
+    s = skip(x -> isnothing(x) || ismissing(x), [1, 2, nothing, missing])
+    @test eltype(s) == Int
+    @test length(similar(s)::Vector{Int}) == 2
+    @test length(similar(s, 1)::Vector{Int}) == 1
+    @test length(similar(s, Float64)::Vector{Float64}) == 2
+    @test length(similar(s, Float64, 5)::Vector{Float64}) == 5
+end
+
 @testitem "set" begin
     using Accessors
     if VERSION >= v"1.9-DEV"
@@ -175,7 +191,7 @@ end
 
 @testitem "_" begin
     import Aqua
-    Aqua.test_all(Skipper; ambiguities=false, piracy=false, project_toml_formatting=false)
+    Aqua.test_all(Skipper; ambiguities=false, piracy=false)
     Aqua.test_ambiguities(Skipper)
 
     import CompatHelperLocal as CHL
