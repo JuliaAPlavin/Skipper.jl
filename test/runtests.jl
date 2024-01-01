@@ -114,7 +114,7 @@ end
     @test a == [5, 2, 3, 5]
 end
 
-@testitem "array types" begin
+@testitem "collection types" begin
     using StructArrays
     using AxisKeys
     using Accessors
@@ -139,6 +139,11 @@ end
         @test b isa KeyedArray{Union{Missing,Float64}}
         @test isequal(b, [missing, -0.25, 0.5, 0.75])
     end
+
+    s = @inferred skip(isnan, (1., 2., NaN))
+    @test collect(s) == [1., 2.]
+    s = @inferred skip(isnan, (a=1., b=2., c=NaN))
+    @test collect(s) == [1., 2.]
 end
 
 @testitem "filterview" begin

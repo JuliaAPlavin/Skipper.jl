@@ -79,10 +79,14 @@ Base.eachrow(A::Skip; kwargs...) = eachslice(A; dims=1)
 Base.eachcol(A::Skip; kwargs...) = eachslice(A; dims=2)
 
 Base.similar(::Type{T}, axes) where {T <: Skip} = similar(similar(parent_type(T), args...), eltype(T))
-Base.similar(A::Skip) = similar(parent(A), eltype(A), length(A))
-Base.similar(A::Skip, ::Type{T}) where {T} = similar(parent(A), T, length(A))
-Base.similar(A::Skip, dims) = similar(parent(A), eltype(A), dims)
-Base.similar(A::Skip, ::Type{T}, dims) where {T} = similar(parent(A), T, dims)
+Base.similar(A::Skip) = _similar(parent(A), eltype(A), length(A))
+Base.similar(A::Skip, ::Type{T}) where {T} = _similar(parent(A), T, length(A))
+Base.similar(A::Skip, dims) = _similar(parent(A), eltype(A), dims)
+Base.similar(A::Skip, ::Type{T}, dims) where {T} = _similar(parent(A), T, dims)
+
+_similar(A, T, dims) = similar(A, T, dims)
+_similar(A::Tuple, T, dims) = Array{T}(undef, dims)
+_similar(A::NamedTuple, T, dims) = Array{T}(undef, dims)
 
 
 Base.BroadcastStyle(::Type{<:Skip}) = Broadcast.Style{Skip}()
