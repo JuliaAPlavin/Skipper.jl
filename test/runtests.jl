@@ -39,6 +39,22 @@ using TestItemRunner
     @test @inferred(eltype(skip(x -> ismissing(x) || x < 0, (x for x in [1, missing, 2, 3])))) == Int
 end
 
+@testitem "slices" begin
+    a = [1 NaN; 2 3]
+    sa = @inferred skip(isnan, a)
+    @test maximum(sa) == 3
+    @test isequal( maximum.(eachslice(a; dims=2)), [2, NaN] )
+    @test maximum.(eachslice(sa; dims=2)) == [2, 3]
+
+    @test isequal( maximum.(eachrow(a)), [NaN, 3] )
+    @test maximum.(eachrow(sa)) == [1, 3]
+    @test isequal( maximum.(eachcol(a)), [2, NaN] )
+    @test maximum.(eachcol(sa)) == [2, 3]
+
+    @test isequal( maximum(a; dims=2), [NaN; 3;;] )
+    @test_broken maximum(sa; dims=2) == [1, 3]
+end
+
 @testitem "setindex" begin
     a = [missing, -1, 2, 3]
     sa = @inferred(skip(x -> ismissing(x) || x < 0, a))

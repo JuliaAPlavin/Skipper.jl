@@ -70,6 +70,10 @@ function Base.map(f, A::Skip)
     return a
 end
 
+Base.eachslice(A::Skip; kwargs...) = map(a -> Skip(_pred(A), a), eachslice(parent(A); kwargs...))
+Base.eachrow(A::Skip; kwargs...) = eachslice(A; dims=1)
+Base.eachcol(A::Skip; kwargs...) = eachslice(A; dims=2)
+
 Base.similar(::Type{T}, args...) where {T <: Skip} = similar(parent_type(T), args...)
 Base.similar(A::Skip, args...) = similar(parent(A), args...)
 Base._similar_for(c::Skip, ::Type{T}, itr, ::Base.SizeUnknown, ::Nothing) where {T} = similar(c, T, 0)
