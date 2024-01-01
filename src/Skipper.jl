@@ -22,21 +22,22 @@ Base.length(s::Skip) = count(!_pred(s), parent(s))
 Base.IndexStyle(::Type{<:Skip{P, TX}}) where {P, TX} = Base.IndexStyle(TX)
 Base.eachindex(s::Skip) = Iterators.filter(i -> !_pred(s)(@inbounds parent(s)[i]), eachindex(parent(s)))
 Base.keys(s::Skip) = Iterators.filter(i -> !_pred(s)(@inbounds parent(s)[i]), keys(parent(s)))
+Base.pairs(s::Skip) = Iterators.filter(p -> !_pred(s)(p[2]), pairs(parent(s)))
 
 Base.@propagate_inbounds function Base.getindex(s::Skip, I...)
     v = parent(s)[I...]
-    _pred(s)(v) && throw(MissingException("the value at index $I is skipped"))
+    @boundscheck _pred(s)(v) && throw(MissingException("the value at index $I is skipped"))
     return v
 end
 
 Base.@propagate_inbounds function Base.setindex!(s::Skip, v, I...)
     oldv = parent(s)[I...]
-    _pred(s)(oldv) && throw(MissingException("existing value at index $I is skipped"))
+    @boundscheck _pred(s)(oldv) && throw(MissingException("existing value at index $I is skipped"))
     # _pred(s)(v) && throw(MissingException("new value to be set at index $I is skipped"))  # should it check the new value?
     return setindex!(parent(s), v, I...)
 end
 
-function Base.iterate(s::Skip, state...)
+@inline function Base.iterate(s::Skip, state...)
     it = iterate(parent(s), state...)
     isnothing(it) && return nothing
     item, state = it

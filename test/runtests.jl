@@ -66,7 +66,7 @@ end
         a = [missing, -1, 2, 3]
         normalize(x) = x ./ sum(x)
         b = @modify(normalize, a |> skip(ismissing, _))
-        @test b isa AbstractVector{Union{Missing,Float64}}
+        @test b isa Vector{Union{Missing,Float64}}
         @test isequal(b, [missing, -0.25, 0.5, 0.75])
     end
 end
