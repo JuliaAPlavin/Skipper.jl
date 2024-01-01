@@ -4,6 +4,8 @@
 - allows arbitrary predicates, such as `ismissing`, `isnan` or `x -> isnan(x) || iszero(x)`
 - supports setting values
 
+Alternatively, use `keep(predicate, collection)` when it is more natural to define what items to keep: for example, `keep(>(0), X)` instead of `skip(x -> isnan(x) || x < 0, X)`.
+
 # Usage
 
 ```julia

@@ -1,6 +1,6 @@
 module Skipper
 
-export skip, filterview
+export skip, keep, filterview
 
 struct Skip{P, TX}
     pred::P
@@ -8,6 +8,7 @@ struct Skip{P, TX}
 end
 
 Base.skip(pred::Function, X) = Skip(pred, X)
+keep(pred, X) = Skip(!pred, X)
 complement(s::Skip) = Skip(!_pred(s), parent(s))
 
 

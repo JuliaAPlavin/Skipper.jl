@@ -3,7 +3,7 @@ using TestItemRunner
 @run_package_tests
 
 
-@testitem "simple" begin
+@testitem "basic" begin
     a = [missing, -1, 2, 3]
     sa = @inferred(skip(x -> ismissing(x) || x < 0, a))
     @test collect(sa) == [2, 3]
@@ -35,6 +35,8 @@ using TestItemRunner
     @test @inferred(eltype(skip(x -> !(x isa Int), [1, missing, nothing, 2, 3]))) == Int
     @test @inferred(eltype(skip(x -> ismissing(x) || x < 0, [1, missing, 2, 3]))) == Int
     @test @inferred(eltype(skip(x -> ismissing(x) || x < 0, (x for x in [1, missing, 2, 3])))) == Int
+
+    @test skip(ismissing, a) === keep(!ismissing, a)
 end
 
 @testitem "views, slices" begin
