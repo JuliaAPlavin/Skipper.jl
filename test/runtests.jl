@@ -119,9 +119,14 @@ end
 
     a = StructArray(a=[missing, -1, 2, 3])
     sa = @inferred skip(x -> ismissing(x.a) || x.a < 0, a)
+
     @test collect(sa).a == [2, 3]
-    @test map(x -> x.a + 1, sa) == [3, 4]
-    @test map(x -> (a=x.a + 1,), sa).a == [3, 4]
+    @test (@inferred map(x -> x.a + 1, sa)) == [3, 4]
+    @test (@inferred map(x -> (a=x.a + 1,), sa)).a == [3, 4]
+
+    @test_broken collect(sa).a::Vector{Int} == [2, 3]
+    @test_broken map(x -> x.a + 1, sa)::Vector{Int} == [3, 4]
+    @test_broken map(x -> (a=x.a + 1,), sa).a::Vector{Int} == [3, 4]
 
     a = KeyedArray([missing, -1, 2, 3], b=[1, 2, 3, 4])
     sa = @inferred skip(x -> ismissing(x) || x < 0, a)
