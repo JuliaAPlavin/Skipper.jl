@@ -8,7 +8,7 @@ TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [compat]
-Aqua = "0.5.5"
+Aqua = "0.5.5, 0.6"
 AxisKeys = "0.2.9"
 CompatHelperLocal = "0.1.24"
 StructArrays = "0.6.12"

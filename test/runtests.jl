@@ -82,7 +82,7 @@ end
 
 @testitem "_" begin
     import Aqua
-    Aqua.test_all(Skipper; ambiguities=false)
+    Aqua.test_all(Skipper; ambiguities=false, piracy=false)
     Aqua.test_ambiguities(Skipper)
 
     import CompatHelperLocal as CHL
